@@ -3,8 +3,8 @@ from time import sleep_ms, ticks_ms
 from machine import I2C, Pin, freq, RTC, Timer
 from esp8266_i2c_lcd import I2cLcd
 
-SSID = "BUY PIZZA TO 412"
-PASS = "5632893683"
+SSID = "SSID"
+PASS = "PASSWORD"
 
 freq(160000000) # Адский разгон до 160MHz
 webrepl.start() # Запуск REPL
