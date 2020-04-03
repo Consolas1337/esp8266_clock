@@ -1,31 +1,50 @@
-customChar = bytearray([
-  0b01010,
-	0b10101,
-	0b10001,
-	0b01010,
-	0b00100,
-	0b00000,
-	0b00000,
-	0b00000
+clock1 = bytearray([
+    0b11111,
+    0b11111,
+    0b01110,
+    0b00100,
+    0b00100,
+    0b01010,
+    0b10001,
+    0b11111
+]);
+clock2 = bytearray([
+    0b11111,
+    0b10001,
+    0b01010,
+    0b00100,
+    0b00100,
+    0b01110,
+    0b11111,
+    0b11111
 ]);
 
+timeClk = Timer(-1)
 
-def showTime():
-  lcd.clear()
-  def updateDate():
-    lcd.move_to(0, 0)
+def renderClock():
+    renderDate()
+    renderTime()
+    if RTC().datetime()[5]==0: # Синхронизация времени раз в час
+        parseTime()
+    
+def renderDate(): # Отрисовка даты
+    lcd.move_to(4, 0)
     formated = "{:0=2}/{:0=2}/{:0=2}".format(RTC().datetime()[2],RTC().datetime()[1],int(str(RTC().datetime()[0])[:-2]))
-    formated = "{: ^16}".format(formated)
     lcd.putstr(formated)
-  def updateTime():
-    updateDate()
-    lcd.move_to(0, 1)
+    
+def renderTime(): # Отрисовка времени
+    lcd.move_to(4, 1)
     formated = "{:0=2}:{:0=2}:{:0=2}".format(RTC().datetime()[4],RTC().datetime()[5],RTC().datetime()[6])
-    formated = "{: ^16}".format(formated)
     lcd.putstr(formated)
     lcd.move_to(15, 1)
-    lcd.putchar(chr(0))
-    lcd.custom_char(0, customChar)
-  timeClk = Timer(-1)
-  timeClk.init(period=1000, mode=Timer.PERIODIC, callback=lambda t:updateTime())
-showTime()
+
+def startClock(): # Функция запуска отрисовки часов
+    lcd.clear()
+    timeClk.init(period=1000, mode=Timer.PERIODIC, callback=lambda t:renderClock())
+
+def stopClock(): # Функция остановки рендера
+    timeClk.deinit()
+    
+
+startClock()
+
