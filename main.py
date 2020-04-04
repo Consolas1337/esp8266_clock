@@ -18,14 +18,6 @@ clock2 = bytearray([
     0b11111,
     0b11111
 ]);
-
-timeClk = Timer(-1)
-
-def renderClock():
-    renderDate()
-    renderTime()
-    if RTC().datetime()[5]==0: # Синхронизация времени раз в час
-        parseTime()
     
 def renderDate(): # Отрисовка даты
     lcd.move_to(4, 0)
@@ -38,13 +30,44 @@ def renderTime(): # Отрисовка времени
     lcd.putstr(formated)
     lcd.move_to(15, 1)
 
-def startClock(): # Функция запуска отрисовки часов
+def renderClock():
+    if RTC().datetime()[5]==0 and RTC().datetime()[6]==0: # Синхронизация времени раз в час
+        parseTime()
+    renderDate()
+    renderTime()
+    gc.collect()
+
+def startClock(): # Функция запуска отрисовки часов 
     lcd.clear()
     timeClk.init(period=1000, mode=Timer.PERIODIC, callback=lambda t:renderClock())
 
-def stopClock(): # Функция остановки рендера
+def stopClock(): # Функция остановки отрисовки часов
     timeClk.deinit()
+    lcd.clear()
     
+def getCovidStats(): # Парсинг статистики COVID-19
+    import urequests, json
+    gc.collect()
+    txt = urequests.get("http://cnsls.ru/covid.php/").text
+    json = json.loads(txt)
+    return json
 
+def renderCovid():
+    #def renderPage(pageNumber):
+     #   if pageNumber==1:
+      #      lcd.clear()
+       #     lcd.move_to(3, 0)
+        #    lcd.putstr("ALL CASES")
+         #   lcd.move_to(7, 1)
+          #  lcd.
+    stopClock()
+    stats = getCovidStats()
+    lcd.move_to(4, 0)
+    lcd.putstr("COVID-19")
+    lcd.move_to(3, 1)
+    lcd.putstr("STATISTICS")
+    #covidClk = Timer(2)
+    #covidClk.init(mode=Timer.ONE_SHOT, period=1000, callback=lambda t:)
+    
+timeClk = Timer(1)
 startClock()
-
